@@ -14,8 +14,8 @@ def residual_func(p,x,y):
     return ret
 
 x=np.linspace(0,1,10)
-y_=real_func(x)
-y=[np.random.normal(0,0.1)+i for i in y_]
+y_true=real_func(x)
+y=[np.random.normal(0,0.1)+i for i in y_true]
 x_points=np.linspace(0,1,1000)
 
 def fitting(M=0):

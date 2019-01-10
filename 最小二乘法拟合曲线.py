@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 
 def real_func(x):
     return np.sin(2*np.pi*x)
-
 def fit_func(p,x):
     f=np.poly1d(p)#创建一个多项式函数，按降幂排列
     return f(x)

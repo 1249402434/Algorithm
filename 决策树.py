@@ -1,4 +1,3 @@
-from sklearn.tree import export_graphviz
 import pandas as pd
 import numpy as np
 import math
@@ -59,7 +58,7 @@ class Node:
 
 class DecisionTree:
     def __init__(self,epsilon=0.1):
-        self.epsilon=epsilon
+        self.epsilon=epsilon    #分裂阈值
         self._tree={}
 
     def entropy(self,p):
@@ -82,7 +81,7 @@ class DecisionTree:
         return experience_entropy
 
     # 经验条件熵
-    def condition_entropy(self,datasets, cond):
+    def condition_entropy(self, datasets, cond):
         feature_sets = {}
         length = len(datasets)
         for i in range(length):

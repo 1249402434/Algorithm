@@ -47,7 +47,7 @@ class Node:
     def __repr__(self):
         return '{}'.format(self.result)
 
-    #此节点可分裂出多个节点
+    #此节点可分裂出多个节点，不一定是二叉树
     def add_node(self,index,node):
         self.tree[index]=node
 
@@ -70,6 +70,7 @@ class DecisionTree:
         label_dict = {}
         for i in range(length):
             label = datasets[i][-1]
+            #统计每个类别的样本数量
             label_dict[label] = label_dict.get(label, 0) + 1
 
         total = sum(label_dict.values())
@@ -85,6 +86,7 @@ class DecisionTree:
         feature_sets = {}
         length = len(datasets)
         for i in range(length):
+            #把当前特征的特征值相同的样本放到同一个列表中
             feature = datasets[i][cond]
             if feature not in feature_sets:
                 feature_sets[feature] = []
@@ -95,6 +97,7 @@ class DecisionTree:
     def info_gain(self,entropy, cond_entropy):
         return entropy - cond_entropy
 
+    #计算并选取信息增益最大的特征
     def info_gain_train(self,datasets):
         feature_count = len(datasets[0]) - 1
         entropy = self.calc_entropy(datasets)
@@ -109,21 +112,28 @@ class DecisionTree:
 
     def train(self,data):
         train_x,train_y,feature_names=data.iloc[:,:-1],data.iloc[:,-1],data.columns[:-1]
-
+        #若D中所有实例属于同一类Ck，则T为单节点树，并将类Ck作为该节点的类标记，返回T
         if len(train_y.value_counts())==1:
             return Node(root=True,label=train_y.iloc[0])
-
+        #若A为空，则T为单节点树，并将D中实例数最大的类Ck作为该节点的类标记，返回T
         if len(feature_names)==0:
             return Node(root=True,label=train_y.value_counts().sort_values(ascending=False).index[0])
-
+        #选取信息增益最大的特征Ag
         max_feature,score=self.info_gain_train(np.array(data))
         max_feature_name=feature_names[max_feature]
-
+        #如果信息增益小于阈值epsilon，则T为单节点树，并将D中实例数最大的类Ck作为该节点的类标记，返回T
         if score<self.epsilon:
             return Node(root=True,label=train_y.value_counts.sort_values(ascending=False).index[0])
 
+        '''
+        否则，对Ag的每一可能值ai，依Ag=ai将D分割为若干非空子集Di，将Di中实例最大的类作为标记，构建子节点
+        由节点及其子节点构成树T，返回T
+        '''
         node_tree=Node(root=False,label=None,feature_name=max_feature_name,feature=max_feature)
 
+        '''
+        对第i个子节点，以Di为训练集，以A-{Ag}为特征集，递归调用
+        '''
         feature_list=data[max_feature_name].value_counts().index
         for f in feature_list:
             child_train=data.loc[data[max_feature_name]==f].drop([max_feature_name],axis=1)

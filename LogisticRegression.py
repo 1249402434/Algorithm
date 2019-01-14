@@ -5,7 +5,6 @@ import math
 from sklearn.model_selection import train_test_split
 
 iris=load_iris()
-print(iris.feature_names)
 data=iris.data
 target=iris.target
 
@@ -43,6 +42,7 @@ class LogisticRegression:
         for i in range(self.max_iter):
             error=0
             for j in range(num):
+                '''向量相乘时注意两向量的维度'''
                 y_hat=self.sigmoid(np.dot(data_mat[j],self.W))
                 error+=self.loss_function(y_hat,y[j])
                 '''损失函数关于权重的偏导数'''
@@ -79,8 +79,9 @@ print(model.score(test_x,test_y))
 
 plt.scatter(data[:50,0],data[:50,1],label='0')
 plt.scatter(data[50:100,0],data[50:100,1],label='1')
-x_points = np.arange(2, 5)
-y_ = -(model.W[2]*x_points + model.W[0])/model.W[1]
+x_points = np.arange(4, 8)
+'''与w1相乘的是图上的X坐标，与w2相乘的是Y坐标，所以直线可进行以下变换'''
+y_ = -(model.W[1]*x_points + model.W[0])/model.W[2]
 plt.plot(x_points, y_)
 plt.legend()
 plt.show()

@@ -1,7 +1,5 @@
 from sklearn.datasets import load_iris
 import math
-import numpy as np
-import matplotlib.pyplot
 from sklearn.model_selection import train_test_split
 
 iris=load_iris()
@@ -23,9 +21,12 @@ class AdaBoost:
         self.X=datasets
         self.Y=labels
         self.M,self.N=datasets.shape
+        #初始化权重
         self.weights=[1/self.M]*self.M
+        #分类器系数
         self.alpha=[]
 
+    #对一个属性选取最优切分点
     def _G(self,features,labels):
         error=10000
         best_v=0.0
@@ -33,15 +34,21 @@ class AdaBoost:
         max_value=max(features)
         step=(max_value-min_value+self.learning_rate)//self.learning_rate
         direct,result_array=None,None
+        #不断变换阈值
         for i in range(1,int(step)):
             v=min_value+self.learning_rate*i
+
+            #严格按照大于小于阈值进行分类，所以v不能与特征取值相同
             if v not in features:
+                #对此特征值按照正向分类
                 result_array_positive=[1 if features[j]>v else -1 for j in range(self.M)]
+                #分类误差
                 weights_error_positive=sum([self.weights[j] for j in range(self.M) if result_array_positive[j]!=labels[j]])
 
                 result_array_negative=[-1 if features[j]>v else 1 for j in range(self.M)]
                 weights_error_negative=sum([self.weights[j] for j in range(self.M) if result_array_negative[j]!=labels[j]])
 
+                #对正向和反向取误差较小的那个
                 if weights_error_negative>weights_error_positive:
                     direct='positivate'
                     _result_array=result_array_positive
@@ -76,6 +83,7 @@ class AdaBoost:
 
     def fit(self,X,y):
         self._init_args(X,y)
+        #每个分类器都要选择一个最优特征的切分点
         for epoch in range(self.n_estimators):
             best_clf_error,best_v,clf_result=10000,None,None
             final_direct,axis=None,None
